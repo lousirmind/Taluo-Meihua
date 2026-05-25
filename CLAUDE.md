@@ -10,8 +10,10 @@
 
 **状态**：全部 5 个 Phase 开发完成，模拟器全功能测试通过。14 条路由全覆盖。
 
+**爻辞数据**：64卦 × 6条 = 384条《周易》标准爻辞，梅花结果页展示
+**塔罗牌义**：78张韦特塔罗，正位+逆位完整含义，翻牌页/解读页展示
 **静态分析**：`dart analyze lib/` — 零错误零警告。
-**构建**：`flutter build apk --debug` — 编译通过。
+**构建**：`flutter build apk --debug` / `release` — 均编译通过。
 
 ## 开发规范
 
@@ -93,15 +95,27 @@
 - 融合映射规则：`docs/PRD.md §3`
 - 塔罗牌义：`lib/data/tarot_cards.json`（78张韦特塔罗）
 
-## Bug 修复历史
+## 模拟器测试结果
 
-| # | 问题 | 修复 |
-|---|------|------|
-| 1 | 互卦/变卦先天数映射错误 | 新增查表 `_binaryToTrigramNumber()` |
-| 2 | 爻线上下颠倒 | `>> i` → `>> (5-i)` |
-| 3 | bit2/bit0 顺序混乱 | 统一 bit2=bottom, bit0=top |
-| 4 | 5个卦掩码数据错误 | 蒙/豫/恒/大壮/解 值修正 |
-| 5 | 梅花时间起卦未实现 | 新增 timeBasedCalculate() |
+- 设备：sdk gphone64 arm64 (Android 14 API 34)
+- 梅花易数流程：输入→起卦→结果 ✅
+- 塔罗占卜流程：抽牌→翻牌→解读 ✅
+- 融合占卜流程：输入→卦象→翻牌→融合解读 ✅
+- 八字/历史/设置页面：正常显示 ✅
+- 运行异常：0 个
+| 6 | Android minSdk 配置 | build.gradle.kts → 26 |
+| 7 | 主页卡片溢出 3.5px | padding 16→12 |
+| 8 | 设置页连接测试类型不匹配 | `_PlaceholderMeihua` → 直接 HTTP 调用 |
+
+### 功能增强
+- **心中所问**：梅花易数、塔罗占卜增加可选问题输入框
+- **解惑指引**：填问题才调用 DeepSeek API，不填只展示内置数据
+- **爻辞详解**：梅花结果页展示384条《周易》爻辞，动爻高亮
+- **牌义全文**：塔罗翻牌页+解读页显示完整 meaningUp/meaningDown
+
+### 自签名发布
+- `release.keystore` 生成，`flutter build apk --release` 通过（54.9MB）
+- APK 位于项目根目录 `Taluo-Meihua-v1.0.0.apk`
 
 ## 模拟器测试结果
 
