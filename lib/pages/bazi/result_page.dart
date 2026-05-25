@@ -23,15 +23,15 @@ class _BaziResultPageState extends State<BaziResultPage> {
   void initState() {
     super.initState();
     _reading = LlmService.instance.getBaziReading(widget.result).then((v) {
-      _autoSave();
+      _autoSave(v);
       return v;
     });
   }
 
-  void _autoSave() {
+  void _autoSave(String reading) {
     if (_saved) return;
     _saved = true;
-    SaveHelper.saveBazi(SaveHelper.encodeBazi(widget.result));
+    SaveHelper.saveBazi(SaveHelper.encodeBazi(widget.result), reading: reading);
   }
 
   @override

@@ -7,6 +7,7 @@ class SaveHelper {
     required Map<String, dynamic> hexagramData,
     required List<Map<String, dynamic>> tarotCards,
     required String? question,
+    String? reading,
   }) {
     return HistoryDao.save(
       type: DivinationType.fusion,
@@ -15,31 +16,43 @@ class SaveHelper {
         'hexagram': hexagramData,
         'tarotCards': tarotCards,
         'question': question ?? '',
+        'reading': reading ?? '',
       },
     );
   }
 
-  static Future<HistoryRecord> saveMeihua(Map<String, dynamic> hexagramData) {
+  static Future<HistoryRecord> saveMeihua(Map<String, dynamic> hexagramData, {String? question, String? reading}) {
     return HistoryDao.save(
       type: DivinationType.meihua,
-      summary: hexagramData['name'] as String? ?? '梅花占卜',
-      jsonData: hexagramData,
+      summary: question ?? hexagramData['name'] as String? ?? '梅花占卜',
+      jsonData: {
+        ...hexagramData,
+        if (question != null && question.isNotEmpty) 'question': question,
+        if (reading != null && reading.isNotEmpty) 'reading': reading,
+      },
     );
   }
 
-  static Future<HistoryRecord> saveTarot(List<Map<String, dynamic>> cards) {
+  static Future<HistoryRecord> saveTarot(List<Map<String, dynamic>> cards, {String? question, String? reading}) {
     return HistoryDao.save(
       type: DivinationType.tarot,
-      summary: cards.map((c) => c['name'] as String).join('·'),
-      jsonData: {'cards': cards},
+      summary: question ?? cards.map((c) => c['name'] as String).join('·'),
+      jsonData: {
+        'cards': cards,
+        if (question != null && question.isNotEmpty) 'question': question,
+        if (reading != null && reading.isNotEmpty) 'reading': reading,
+      },
     );
   }
 
-  static Future<HistoryRecord> saveBazi(Map<String, dynamic> baziData) {
+  static Future<HistoryRecord> saveBazi(Map<String, dynamic> baziData, {String? reading}) {
     return HistoryDao.save(
       type: DivinationType.bazi,
       summary: '${baziData['dayMaster']}日主 · ${baziData['yearPillar']?['heavenlyStem']}${baziData['yearPillar']?['earthlyBranch']}年',
-      jsonData: baziData,
+      jsonData: {
+        ...baziData,
+        if (reading != null && reading.isNotEmpty) 'reading': reading,
+      },
     );
   }
 

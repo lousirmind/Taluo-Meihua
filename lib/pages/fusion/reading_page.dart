@@ -22,12 +22,12 @@ class _FusionReadingPageState extends State<FusionReadingPage> {
   void initState() {
     super.initState();
     _reading = LlmService.instance.getFusionReading(widget.fusionResult, question: widget.fusionResult.question).then((v) {
-      _autoSave();
+      _autoSave(v);
       return v;
     });
   }
 
-  void _autoSave() {
+  void _autoSave(String reading) {
     if (_saved) return;
     _saved = true;
     final r = widget.fusionResult;
@@ -35,6 +35,7 @@ class _FusionReadingPageState extends State<FusionReadingPage> {
       hexagramData: SaveHelper.encodeMeihua(r.meihua),
       tarotCards: SaveHelper.encodeTarot(r.tarot),
       question: r.question,
+      reading: reading,
     );
   }
 

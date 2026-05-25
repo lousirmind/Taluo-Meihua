@@ -84,13 +84,13 @@ class _CardFlipWidgetState extends State<CardFlipWidget>
   }
 
   Widget _buildFace(Widget child, bool isFront) {
-    if (!isFront) {
-      return Transform(
-        alignment: Alignment.center,
-        transform: Matrix4.identity()..rotateY(3.14159),
-        child: SizedBox(width: widget.width, height: widget.height, child: child),
-      );
-    }
-    return SizedBox(width: widget.width, height: widget.height, child: child);
+    // 两面统一补 π 旋转，抵消父级 Transform 在动画终点的旋转
+    // 翻转前(animation=0): 父级旋转0 + 本层π → 背面正常显示(对称图案)
+    // 翻转后(animation=1): 父级旋转π + 本层π = 2π → 正面正常显示 ✓
+    return Transform(
+      alignment: Alignment.center,
+      transform: Matrix4.identity()..rotateY(3.14159),
+      child: SizedBox(width: widget.width, height: widget.height, child: child),
+    );
   }
 }

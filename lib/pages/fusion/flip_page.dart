@@ -61,7 +61,10 @@ class _FusionFlipPageState extends State<FusionFlipPage> {
                         front: _buildEmptyCard(cs),
                         back: _buildBack(cs),
                         flipped: _flipped[i],
-                        onFlip: () => setState(() => _flippedCount++),
+                        onFlip: () => setState(() {
+                          _flipped[i] = true;
+                          _flippedCount++;
+                        }),
                         width: 100,
                         height: 160,
                       ),

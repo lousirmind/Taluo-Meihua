@@ -27,16 +27,16 @@ class _MeihuaResultPageState extends State<MeihuaResultPage> {
     final q = widget.question;
     if (q != null && q.isNotEmpty) {
       _reading = LlmService.instance.getMeihuaReading(widget.result, question: q).then((v) {
-        _autoSave();
+        _autoSave(v);
         return v;
       });
     }
   }
 
-  void _autoSave() {
+  void _autoSave(String reading) {
     if (_saved) return;
     _saved = true;
-    SaveHelper.saveMeihua(SaveHelper.encodeMeihua(widget.result));
+    SaveHelper.saveMeihua(SaveHelper.encodeMeihua(widget.result), question: widget.question, reading: reading);
   }
 
   @override

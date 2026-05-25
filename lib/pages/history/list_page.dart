@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../data/database/history_dao.dart';
 import '../../models/history_record.dart';
@@ -115,12 +116,19 @@ class _HistoryListPageState extends State<HistoryListPage> {
               margin: const EdgeInsets.symmetric(vertical: 4),
               child: ListTile(
                 leading: Icon(_typeIcon(r.type), color: _typeColor(r.type)),
-                title: Text(r.typeLabel, style: const TextStyle(fontWeight: FontWeight.w500)),
-                subtitle: Text(
-                  '${_formatTime(r.createTime)}${r.summary.isNotEmpty ? " · ${r.summary}" : ""}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 12, color: cs.onSurface.withValues(alpha: 0.5)),
+                title: Text('占卜方式：${r.typeLabel}', style: const TextStyle(fontWeight: FontWeight.w500)),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(_formatTime(r.createTime),
+                      style: TextStyle(fontSize: 12, color: cs.onSurface.withValues(alpha: 0.5))),
+                    if (_extractQuestion(r) case final q?) ...[
+                      const SizedBox(height: 2),
+                      Text('占卜问题：$q',
+                        maxLines: 1, overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 13, color: cs.primary.withValues(alpha: 0.8))),
+                    ],
+                  ],
                 ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => Navigator.pushNamed(context, '/history/detail', arguments: r),
@@ -147,6 +155,17 @@ class _HistoryListPageState extends State<HistoryListPage> {
       case DivinationType.meihua: return Colors.teal;
       case DivinationType.tarot: return Colors.indigo;
       case DivinationType.bazi: return Colors.brown;
+    }
+  }
+
+  String? _extractQuestion(HistoryRecord r) {
+    if (r.jsonData == null || r.jsonData!.isEmpty) return null;
+    try {
+      final data = jsonDecode(r.jsonData!) as Map<String, dynamic>;
+      final q = data['question'] as String?;
+      return (q != null && q.isNotEmpty) ? q : null;
+    } catch (_) {
+      return null;
     }
   }
 

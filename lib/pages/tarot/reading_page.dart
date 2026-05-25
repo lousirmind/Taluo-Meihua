@@ -34,7 +34,7 @@ class _TarotReadingPageState extends State<TarotReadingPage> {
       final q = _question;
       if (q != null && q.isNotEmpty) {
         _reading = LlmService.instance.getTarotReading(_spread!, question: q).then((v) {
-          _autoSave();
+          _autoSave(v);
           return v;
         });
       }
@@ -42,10 +42,10 @@ class _TarotReadingPageState extends State<TarotReadingPage> {
     }
   }
 
-  void _autoSave() {
+  void _autoSave(String reading) {
     if (_saved || _spread == null) return;
     _saved = true;
-    SaveHelper.saveTarot(SaveHelper.encodeTarot(_spread!));
+    SaveHelper.saveTarot(SaveHelper.encodeTarot(_spread!), question: _question, reading: reading);
   }
 
   @override

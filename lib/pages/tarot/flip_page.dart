@@ -47,29 +47,32 @@ class _TarotFlipPageState extends State<TarotFlipPage> {
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: const Text('翻牌占卜')),
-      body: Column(
-        children: [
-          const SizedBox(height: 24),
-          Text(
-            '点击牌面进行翻牌',
-            style: TextStyle(
-              fontSize: 14,
-              color: cs.onSurface.withValues(alpha: 0.6),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 24),
+            Text(
+              '点击牌面进行翻牌',
+              style: TextStyle(
+                fontSize: 14,
+                color: cs.onSurface.withValues(alpha: 0.6),
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            height: 200,
-            child: Center(
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: List.generate(3, (i) => _buildCardColumn(i, spread, cs)),
               ),
             ),
-          ),
-          _buildMeanings(spread, cs),
-          _buildBottomButton(cs),
-        ],
+            const SizedBox(height: 8),
+            _buildMeanings(spread, cs),
+            _buildBottomButton(cs),
+            const SizedBox(height: 16),
+          ],
+        ),
       ),
     );
   }
@@ -77,47 +80,47 @@ class _TarotFlipPageState extends State<TarotFlipPage> {
   Widget _buildMeanings(TarotSpread spread, ColorScheme cs) {
     final anyFlipped = _flippedStates.any((f) => f);
     if (!anyFlipped) return const SizedBox.shrink();
-    return SizedBox(
-      height: 180,
-      child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        children: List.generate(3, (i) {
-          if (!_flippedStates[i]) return const SizedBox.shrink();
-          final pos = spread.positions[i];
-          final meaning = pos.isReversed ? pos.card.meaningDown : pos.card.meaningUp;
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    final cards = List.generate(3, (i) {
+      if (!_flippedStates[i]) return const SizedBox.shrink();
+      final pos = spread.positions[i];
+      final meaning = pos.isReversed ? pos.card.meaningDown : pos.card.meaningUp;
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        Text('【${pos.name}】', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: cs.primary)),
-                        const SizedBox(width: 6),
-                        Text(pos.card.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: pos.isReversed ? Colors.orange.withValues(alpha: 0.2) : Colors.green.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(pos.isReversed ? '逆位' : '正位', style: TextStyle(fontSize: 10, color: pos.isReversed ? Colors.orange : Colors.green)),
-                        ),
-                      ],
+                    Text('【${pos.name}】', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: cs.primary)),
+                    const SizedBox(width: 6),
+                    Text(pos.card.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: pos.isReversed ? Colors.orange.withValues(alpha: 0.2) : Colors.green.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(pos.isReversed ? '逆位' : '正位', style: TextStyle(fontSize: 10, color: pos.isReversed ? Colors.orange : Colors.green)),
                     ),
-                    const SizedBox(height: 4),
-                    Text(meaning, style: TextStyle(fontSize: 12, height: 1.4, color: cs.onSurface.withValues(alpha: 0.8))),
                   ],
                 ),
-              ),
+                const SizedBox(height: 4),
+                Text(meaning, style: TextStyle(fontSize: 12, height: 1.4, color: cs.onSurface.withValues(alpha: 0.8))),
+              ],
             ),
-          );
-        }),
-      ),
+          ),
+        ),
+      );
+    });
+    return ListView(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      children: cards,
     );
   }
 
@@ -243,40 +246,12 @@ class _TarotFlipPageState extends State<TarotFlipPage> {
   }
 
   Widget _buildCardFace(TarotPosition position, ColorScheme cs) {
+    // 牌框留空，后续放图片
     return Container(
       decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest,
+        color: cs.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: cs.outlineVariant,
-          width: 1,
-        ),
-      ),
-      padding: const EdgeInsets.all(6),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            position.card.name,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          _buildOrientationBadge(position.isReversed),
-          const SizedBox(height: 4),
-          Text(
-            position.card.keyword,
-            style: TextStyle(
-              fontSize: 9,
-              color: cs.onSurface.withValues(alpha: 0.6),
-            ),
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+        border: Border.all(color: cs.outlineVariant, width: 1),
       ),
     );
   }
