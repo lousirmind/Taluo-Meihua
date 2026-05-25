@@ -43,8 +43,16 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/build/
 
 # Project documentation (kept local)
 /docs/
 /docs（参考）/
 /android-dev-skill.skill
+
+# Keystore and signing config
+release.keystore
+android/key.properties
+
+# Release APK
+*.apk

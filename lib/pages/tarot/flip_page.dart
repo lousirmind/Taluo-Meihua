@@ -11,6 +11,7 @@ class TarotFlipPage extends StatefulWidget {
 
 class _TarotFlipPageState extends State<TarotFlipPage> {
   TarotSpread? _spread;
+  String? _question;
   late List<bool> _flippedStates;
   bool _initialized = false;
 
@@ -18,7 +19,14 @@ class _TarotFlipPageState extends State<TarotFlipPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialized) {
-      _spread = ModalRoute.of(context)!.settings.arguments as TarotSpread;
+      final args = ModalRoute.of(context)!.settings.arguments;
+      if (args is TarotSpread) {
+        _spread = args;
+      } else {
+        final map = args as Map<String, dynamic>;
+        _spread = map['spread'] as TarotSpread;
+        _question = map['question'] as String?;
+      }
       _flippedStates = List.filled(3, false);
       _initialized = true;
     }
@@ -50,7 +58,8 @@ class _TarotFlipPageState extends State<TarotFlipPage> {
             ),
           ),
           const SizedBox(height: 24),
-          Expanded(
+          SizedBox(
+            height: 200,
             child: Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -58,8 +67,56 @@ class _TarotFlipPageState extends State<TarotFlipPage> {
               ),
             ),
           ),
+          _buildMeanings(spread, cs),
           _buildBottomButton(cs),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMeanings(TarotSpread spread, ColorScheme cs) {
+    final anyFlipped = _flippedStates.any((f) => f);
+    if (!anyFlipped) return const SizedBox.shrink();
+    return SizedBox(
+      height: 180,
+      child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        children: List.generate(3, (i) {
+          if (!_flippedStates[i]) return const SizedBox.shrink();
+          final pos = spread.positions[i];
+          final meaning = pos.isReversed ? pos.card.meaningDown : pos.card.meaningUp;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text('【${pos.name}】', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: cs.primary)),
+                        const SizedBox(width: 6),
+                        Text(pos.card.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12)),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: pos.isReversed ? Colors.orange.withValues(alpha: 0.2) : Colors.green.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(pos.isReversed ? '逆位' : '正位', style: TextStyle(fontSize: 10, color: pos.isReversed ? Colors.orange : Colors.green)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(meaning, style: TextStyle(fontSize: 12, height: 1.4, color: cs.onSurface.withValues(alpha: 0.8))),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }),
       ),
     );
   }
@@ -75,7 +132,10 @@ class _TarotFlipPageState extends State<TarotFlipPage> {
         height: 48,
         child: FilledButton.icon(
           onPressed: () =>
-              Navigator.pushNamed(context, '/tarot/reading', arguments: _spread),
+              Navigator.pushNamed(context, '/tarot/reading', arguments: {
+                'spread': _spread,
+                'question': _question,
+              }),
           icon: const Icon(Icons.auto_awesome),
           label: const Text('查看完整解读'),
         ),

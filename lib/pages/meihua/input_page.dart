@@ -14,6 +14,7 @@ class _MeihuaInputPageState extends State<MeihuaInputPage> {
   final _n1Ctrl = TextEditingController();
   final _n2Ctrl = TextEditingController();
   final _n3Ctrl = TextEditingController();
+  final _questionCtrl = TextEditingController();
   bool _isNumberMode = true;
 
   @override
@@ -21,6 +22,7 @@ class _MeihuaInputPageState extends State<MeihuaInputPage> {
     _n1Ctrl.dispose();
     _n2Ctrl.dispose();
     _n3Ctrl.dispose();
+    _questionCtrl.dispose();
     super.dispose();
   }
 
@@ -43,10 +45,16 @@ class _MeihuaInputPageState extends State<MeihuaInputPage> {
         return;
       }
       final result = MeihuaEngine.calculate(n1, n2, n3);
-      Navigator.pushNamed(context, '/meihua/result', arguments: result);
+      Navigator.pushNamed(context, '/meihua/result', arguments: {
+        'result': result,
+        'question': _questionCtrl.text.trim(),
+      });
     } else {
       final result = MeihuaEngine.timeBasedCalculate(DateTime.now());
-      Navigator.pushNamed(context, '/meihua/result', arguments: result);
+      Navigator.pushNamed(context, '/meihua/result', arguments: {
+        'result': result,
+        'question': _questionCtrl.text.trim(),
+      });
     }
   }
 
@@ -67,9 +75,19 @@ class _MeihuaInputPageState extends State<MeihuaInputPage> {
               selected: {_isNumberMode},
               onSelectionChanged: (v) => setState(() => _isNumberMode = v.first),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             if (_isNumberMode) _buildNumberMode(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _questionCtrl,
+              maxLines: 2,
+              decoration: const InputDecoration(
+                labelText: '心中所问（选填）',
+                hintText: '输入你心中的问题，将开启解惑指引...',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
             SizedBox(
               height: 48,
               child: FilledButton.icon(
@@ -91,7 +109,7 @@ class _MeihuaInputPageState extends State<MeihuaInputPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text('请输入三个正整数（1-9999）', style: Theme.of(context).textTheme.bodyMedium),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         Row(
           children: [
             Expanded(child: TextField(
@@ -101,8 +119,8 @@ class _MeihuaInputPageState extends State<MeihuaInputPage> {
               decoration: const InputDecoration(labelText: '数字一', hintText: '上卦'),
             )),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Icon(Icons.close, size: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
             ),
             Expanded(child: TextField(
               controller: _n2Ctrl,
@@ -111,8 +129,8 @@ class _MeihuaInputPageState extends State<MeihuaInputPage> {
               decoration: const InputDecoration(labelText: '数字二', hintText: '下卦'),
             )),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: Icon(Icons.close, size: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
             ),
             Expanded(child: TextField(
               controller: _n3Ctrl,
@@ -122,7 +140,7 @@ class _MeihuaInputPageState extends State<MeihuaInputPage> {
             )),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         Align(
           alignment: Alignment.centerRight,
           child: TextButton.icon(

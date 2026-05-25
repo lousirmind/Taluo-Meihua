@@ -5,26 +5,31 @@ import '../../widgets/disclaimer_text.dart';
 import '../../services/llm_service.dart';
 import '../../app/theme.dart';
 import '../../data/save_helper.dart';
+import '../../data/constants/hexagrams.dart';
 
 class MeihuaResultPage extends StatefulWidget {
   final MeihuaResult result;
-  const MeihuaResultPage({super.key, required this.result});
+  final String? question;
+  const MeihuaResultPage({super.key, required this.result, this.question});
 
   @override
   State<MeihuaResultPage> createState() => _MeihuaResultPageState();
 }
 
 class _MeihuaResultPageState extends State<MeihuaResultPage> {
-  late Future<String> _reading;
+  Future<String>? _reading;
   bool _saved = false;
 
   @override
   void initState() {
     super.initState();
-    _reading = LlmService.instance.getMeihuaReading(widget.result).then((v) {
-      _autoSave();
-      return v;
-    });
+    final q = widget.question;
+    if (q != null && q.isNotEmpty) {
+      _reading = LlmService.instance.getMeihuaReading(widget.result).then((v) {
+        _autoSave();
+        return v;
+      });
+    }
   }
 
   void _autoSave() {
@@ -53,9 +58,13 @@ class _MeihuaResultPageState extends State<MeihuaResultPage> {
               movingYaoPos: r.movingYao.position,
             ),
             const SizedBox(height: 16),
-            _buildInfoCard(r),
+            _buildYaoCard(r),
             const SizedBox(height: 16),
-            _buildReadingCard(),
+            _buildInfoCard(r),
+            if (_reading != null) ...[
+              const SizedBox(height: 16),
+              _buildReadingCard(),
+            ],
             const SizedBox(height: 8),
             const DisclaimerText(),
           ],
@@ -92,6 +101,54 @@ class _MeihuaResultPageState extends State<MeihuaResultPage> {
     );
   }
 
+  Widget _buildYaoCard(MeihuaResult r) {
+    final cs = Theme.of(context).colorScheme;
+    final entry = HexagramsData.getHexagram(r.benGua.sequence);
+    final moving = r.movingYao.position;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('爻辞详解', style: TextStyle(fontWeight: FontWeight.bold, color: cs.primary, fontSize: 15)),
+            const SizedBox(height: 8),
+            ...List.generate(6, (i) {
+              final pos = i + 1;
+              final isMoving = pos == moving;
+              return Container(
+                margin: const EdgeInsets.only(bottom: 4),
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: isMoving ? Colors.amber.withValues(alpha: 0.15) : null,
+                  borderRadius: BorderRadius.circular(4),
+                  border: isMoving ? Border.all(color: Colors.amber, width: 1) : null,
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 60,
+                      child: Text('第${pos}爻${isMoving ? " ⚡" : ""}',
+                        style: TextStyle(fontSize: 12, fontWeight: isMoving ? FontWeight.bold : FontWeight.normal,
+                          color: isMoving ? Colors.amber.shade800 : cs.onSurface.withValues(alpha: 0.6))),
+                    ),
+                    Expanded(
+                      child: Text(
+                        pos <= entry.yaoTexts.length ? entry.yaoTexts[pos - 1] : '',
+                        style: TextStyle(fontSize: 13, height: 1.4, color: cs.onSurface),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildInfoCard(MeihuaResult r) {
     final cs = Theme.of(context).colorScheme;
     return Card(
@@ -120,7 +177,24 @@ class _MeihuaResultPageState extends State<MeihuaResultPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('卦象解读', style: TextStyle(fontWeight: FontWeight.bold, color: cs.primary)),
+            Row(
+              children: [
+                const Icon(Icons.lightbulb_outline, size: 20),
+                const SizedBox(width: 6),
+                Text('解惑指引', style: TextStyle(fontWeight: FontWeight.bold, color: cs.primary, fontSize: 16)),
+              ],
+            ),
+            if (widget.question != null && widget.question!.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: cs.primaryContainer.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text('你的问题：${widget.question}', style: TextStyle(fontSize: 13, color: cs.onSurface.withValues(alpha: 0.7))),
+              ),
+            ],
             const SizedBox(height: 8),
             FutureBuilder<String>(
               future: _reading,

@@ -43,9 +43,11 @@ class LingXiTianJiApp extends StatelessWidget {
           settings: settings,
         );
       case '/meihua/result':
+        final args = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
           builder: (_) => meihua_result.MeihuaResultPage(
-            result: settings.arguments as MeihuaResult,
+            result: args['result'] as MeihuaResult,
+            question: args['question'] as String?,
           ),
           settings: settings,
         );

@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import '../../data/secure_storage.dart';
 import '../../data/database/history_dao.dart';
 import '../../services/llm_service.dart';
@@ -66,21 +68,30 @@ class _SettingsPageState extends State<SettingsPage> {
       return;
     }
     try {
-      final service = DeepseekLlmService();
-      final result = await service.getMeihuaReading(
-        // Use placeholder - just test API connectivity
-        _makePlaceholderMeihua(),
+      final response = await http.post(
+        Uri.parse('https://api.deepseek.com/v1/chat/completions'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $key',
+        },
+        body: jsonEncode({
+          'model': 'deepseek-chat',
+          'messages': [
+            {'role': 'user', 'content': 'Hello'},
+          ],
+          'max_tokens': 10,
+        }),
       );
-      setState(() => _testResult = result.contains('配置') ? '❌ $result' : '✅ API 连接成功');
+      if (response.statusCode == 200) {
+        setState(() => _testResult = '✅ API 连接成功');
+      } else {
+        setState(() => _testResult = '❌ 连接失败 (${response.statusCode}): ${response.body}');
+      }
     } catch (e) {
       setState(() => _testResult = '❌ 连接失败: $e');
     } finally {
       setState(() => _testing = false);
     }
-  }
-
-  dynamic _makePlaceholderMeihua() {
-    return _PlaceholderMeihua();
   }
 
   Future<void> _clearHistory() async {
@@ -215,46 +226,4 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
-}
-
-/// 占位对象用于 API 连通性测试（不依赖实际卦象数据）
-class _PlaceholderMeihua {
-  final benGua = _PlaceholderHexagram();
-  final huGua = _PlaceholderHexagram();
-  final bianGua = _PlaceholderHexagram();
-  final movingYao = _PlaceholderYao();
-  final tiYong = _PlaceholderTiYong();
-}
-
-class _PlaceholderHexagram {
-  final name = '测试';
-  final sequence = 1;
-  final guaCi = '';
-  final guaCiTranslation = '';
-  final upperSymbol = '';
-  final lowerSymbol = '';
-  final lines = <dynamic>[];
-}
-
-class _PlaceholderYao {
-  final position = 1;
-  final originalIsYang = true;
-  final changedIsYang = false;
-}
-
-class _PlaceholderTiYong {
-  final tiGua = _PlaceholderTrigram();
-  final yongGua = _PlaceholderTrigram();
-  final tiElement = '金';
-  final yongElement = '木';
-  final relation = '体克用';
-  final interpretation = '';
-}
-
-class _PlaceholderTrigram {
-  final name = '乾';
-  final element = '金';
-  final symbol = '☰';
-  final nature = '天';
-  final number = 1;
 }
