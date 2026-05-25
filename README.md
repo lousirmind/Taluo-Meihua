@@ -1,17 +1,84 @@
-# tarot_meihua
+# 灵犀天机
 
-A new Flutter project.
+融合占卜 · 梅花易数 · 塔罗占卜 · 八字命理
 
-## Getting Started
+基于梅花易数与塔罗牌的中西合璧占卜工具，搭载 DeepSeek AI 解读引擎。
 
-This project is a starting point for a Flutter application.
+## 功能模块
 
-A few resources to get you started if this is your first Flutter project:
+| 模块 | 说明 |
+|------|------|
+| **融合占卜** | 梅花易数定势 → 级联映射塔罗牌阵，实现"宏观趋势 + 微观细节"统一解读 |
+| **梅花易数** | 数字起卦 / 时间起卦，本卦/互卦/变卦/体用生克完整推演 |
+| **塔罗占卜** | 标准韦特塔罗 78 张，3 张牌阵（过去/现在/未来），逐张翻牌动画 |
+| **八字命理** | 四柱排盘 / 藏干 / 十神 / 大运 / 流年 / 纳音 / 空亡 / 真太阳时校正 |
+| **历史记录** | 本地 SQLite 存储，类型筛选，详情回溯 |
+| **AI 解读** | DeepSeek API 驱动的自然语言解读（需用户自行配置 API Key） |
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## 技术栈
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **框架**: Flutter 3.44 / Dart 3.12
+- **主题**: Material Design 3
+- **数据库**: SQLite（sqflite）
+- **AI**: DeepSeek API
+- **加密**: flutter_secure_storage
+- **构建**: Android 8.0+ (API 26+)
+- **静态分析**: `dart analyze lib/` — 零错误零警告
+
+## 快速开始
+
+```bash
+# 克隆项目
+git clone https://github.com/lousirmind/Taluo-Meihua.git
+cd Taluo-Meihua
+
+# 安装依赖
+flutter pub get
+
+# 运行（需连接设备或模拟器）
+flutter run
+
+# 或构建 APK
+flutter build apk --debug
+```
+
+> **注意**: AI 解读功能需要 DeepSeek API Key。启动 App 后在「设置」页填入即可。未配置 Key 时显示占位解读文本。
+
+## 项目结构
+
+```
+lib/
+├── main.dart                   # 入口（启动时检查 API Key）
+├── app/                        # Material 3 主题 + 14 条路由
+├── models/                     # 数据模型（梅花 / 塔罗 / 八字 / 融合 / 历史）
+├── data/                       # 常量 / 78 张塔罗牌义库 / SQLite / 加密存储
+├── engines/                    # 算法引擎（梅花起卦 / 塔罗抽牌 / 八字排盘 / 融合映射）
+├── services/                   # DeepSeek API + LLM 接口抽象
+├── pages/                      # 15 个页面（融合 / 梅花 / 塔罗 / 八字 / 历史 / 设置）
+└── widgets/                    # 通用组件（翻牌动画 / 卦象可视化 / 免责声明）
+```
+
+## 算法
+
+| 引擎 | 覆盖 |
+|------|------|
+| 梅花易数 | 数字起卦、时间起卦、本卦/互卦/变卦、体用生克（5种关系） |
+| 塔罗 | 78 张随机抽牌、正逆位判定、按牌组筛选、融合模式映射策略 |
+| 八字 | 年柱（立春分界）、月柱（节气+五虎遁）、日柱（基准偏移）、时柱（五鼠遁+真太阳时）、十神、大运、空亡、纳音 |
+| 融合映射 | 八卦五行→塔罗牌组、体用生克→塔罗基调、动爻位置→牌阵聚焦 |
+
+## 开发阶段
+
+所有 5 个 Phase 开发完成，模拟器全功能测试通过。
+
+| Phase | 内容 | 状态 |
+|-------|------|------|
+| 1 | 数据层 + 算法引擎 | ✅ |
+| 2 | 梅花 + 塔罗独立模块 | ✅ |
+| 3 | 融合占卜 | ✅ |
+| 4 | 八字命理 | ✅ |
+| 5 | 收尾 + 测试 | ✅ |
+
+## 许可证
+
+MIT
