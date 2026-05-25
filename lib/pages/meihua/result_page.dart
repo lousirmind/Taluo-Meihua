@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../models/meihua/meihua_result.dart';
 import '../../widgets/hexagram_view.dart';
 import '../../widgets/disclaimer_text.dart';
@@ -25,7 +26,7 @@ class _MeihuaResultPageState extends State<MeihuaResultPage> {
     super.initState();
     final q = widget.question;
     if (q != null && q.isNotEmpty) {
-      _reading = LlmService.instance.getMeihuaReading(widget.result).then((v) {
+      _reading = LlmService.instance.getMeihuaReading(widget.result, question: q).then((v) {
         _autoSave();
         return v;
       });
@@ -205,7 +206,7 @@ class _MeihuaResultPageState extends State<MeihuaResultPage> {
                     child: CircularProgressIndicator(),
                   ));
                 }
-                return Text(snapshot.data ?? '解读生成失败', style: const TextStyle(height: 1.6));
+                return MarkdownBody(data: snapshot.data ?? '解读生成失败');
               },
             ),
           ],

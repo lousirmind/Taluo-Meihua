@@ -10,16 +10,16 @@ abstract class LlmService {
   /// 设置具体实现
   static void configure(LlmService service) => instance = service;
 
-  Future<String> getFusionReading(FusionResult result);
-  Future<String> getMeihuaReading(MeihuaResult result);
-  Future<String> getTarotReading(TarotSpread spread);
-  Future<String> getBaziReading(BaziResult result);
+  Future<String> getFusionReading(FusionResult result, {String? question});
+  Future<String> getMeihuaReading(MeihuaResult result, {String? question});
+  Future<String> getTarotReading(TarotSpread spread, {String? question});
+  Future<String> getBaziReading(BaziResult result, {String? question});
 }
 
 /// 占位实现 — 返回固定文本，待 DeepSeek API 集成后替换
 class _PlaceholderService extends LlmService {
   @override
-  Future<String> getFusionReading(FusionResult result) async {
+  Future<String> getFusionReading(FusionResult result, {String? question}) async {
     await Future.delayed(const Duration(seconds: 1));
     return '【融合占卜解读占位】\n\n'
         '梅花卦象：${result.meihua.benGua.name}\n'
@@ -29,7 +29,7 @@ class _PlaceholderService extends LlmService {
   }
 
   @override
-  Future<String> getMeihuaReading(MeihuaResult result) async {
+  Future<String> getMeihuaReading(MeihuaResult result, {String? question}) async {
     await Future.delayed(const Duration(seconds: 1));
     return '【梅花易数解读占位】\n\n'
         '本卦：${result.benGua.name}\n'
@@ -39,7 +39,7 @@ class _PlaceholderService extends LlmService {
   }
 
   @override
-  Future<String> getTarotReading(TarotSpread spread) async {
+  Future<String> getTarotReading(TarotSpread spread, {String? question}) async {
     await Future.delayed(const Duration(seconds: 1));
     return '【塔罗占卜解读占位】\n\n'
         '${spread.positions.map((p) => '【${p.name}】${p.card.name}(${p.isReversed ? "逆位" : "正位"})\n${p.isReversed ? p.card.meaningDown : p.card.meaningUp}').join("\n\n")}\n\n'
@@ -47,7 +47,7 @@ class _PlaceholderService extends LlmService {
   }
 
   @override
-  Future<String> getBaziReading(BaziResult result) async {
+  Future<String> getBaziReading(BaziResult result, {String? question}) async {
     await Future.delayed(const Duration(seconds: 1));
     return '【八字命理解读占位】\n\n'
         '日主：${result.dayMaster}（${result.dayMasterElement}）\n'

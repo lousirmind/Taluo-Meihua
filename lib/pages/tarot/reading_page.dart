@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../models/tarot/tarot_spread.dart';
 import '../../services/llm_service.dart';
 import '../../widgets/disclaimer_text.dart';
@@ -32,7 +33,7 @@ class _TarotReadingPageState extends State<TarotReadingPage> {
       }
       final q = _question;
       if (q != null && q.isNotEmpty) {
-        _reading = LlmService.instance.getTarotReading(_spread!).then((v) {
+        _reading = LlmService.instance.getTarotReading(_spread!, question: q).then((v) {
           _autoSave();
           return v;
         });
@@ -206,7 +207,7 @@ class _TarotReadingPageState extends State<TarotReadingPage> {
                 if (snapshot.hasError) {
                   return Text('解读生成失败：${snapshot.error}', style: TextStyle(color: cs.error));
                 }
-                return Text(snapshot.data ?? '暂无解读内容', style: const TextStyle(height: 1.6, fontSize: 14));
+                return MarkdownBody(data: snapshot.data ?? '暂无解读内容');
               },
             ),
           ],

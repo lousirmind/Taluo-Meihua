@@ -8,6 +8,7 @@ import '../models/tarot/tarot_spread.dart';
 import '../models/bazi/bazi_result.dart';
 
 /// DeepSeek API 实现的 LLM 解读服务
+/// 使用 DeepSeek V4 Flash (deepseek-chat) 模型
 class DeepseekLlmService extends LlmService {
   static const _baseUrl = 'https://api.deepseek.com/v1/chat/completions';
   static const _model = 'deepseek-chat';
@@ -38,7 +39,7 @@ class DeepseekLlmService extends LlmService {
             {'role': 'system', 'content': systemPrompt},
             {'role': 'user', 'content': userMessage},
           ],
-          'max_tokens': 2000,
+          'max_tokens': 500,
           'temperature': 0.7,
         }),
       );
@@ -63,33 +64,36 @@ class DeepseekLlmService extends LlmService {
 2. 微观细节：基于塔罗牌面分析具体领域情况
 3. 体用关系：解释体用生克带来的吉凶提示
 4. 综合建议：将两种体系合拢给出建议
-注意：明确标注"以上解读仅供娱乐参考，请理性看待。"
+注意：你必须针对用户提出的具体问题进行解读，将卦象和牌面与问题相关联。
+回答简洁，控制在200字以内。
 ''';
 
   static const _meihuaSystemPrompt = '''
 你是一位精通梅花易数的解读师。
 解读需包含：卦象含义、体用生克分析、动爻解读、综合提示。
-保持专业、中肯的语调。结尾标注"仅供娱乐参考"。
+你必须针对用户提出的具体问题进行解读，将卦象含义与问题相关联。
+回答简洁，控制在200字以内。
 ''';
 
   static const _tarotSystemPrompt = '''
 你是一位专业的塔罗解读师，使用经典韦特塔罗体系。
 解读需包含：三牌综合含义、正逆位影响、位置关联、综合建议。
-保持专业、中肯。结尾标注"仅供娱乐参考"。
+你必须针对用户提出的具体问题进行解读，将牌面含义与问题相关联。
+回答简洁，控制在200字以内。
 ''';
 
   static const _baziSystemPrompt = '''
 你是一位精通子平八字的命理师。
 解读需包含：日主分析、四柱格局、五行旺衰、十神配置、大运走势、流年提示。
-语言通俗易懂，专业术语附带解释。结尾标注"仅供娱乐参考"。
+回答简洁，控制在200字以内。语言通俗易懂，专业术语附带解释。
 ''';
 
   @override
-  Future<String> getFusionReading(FusionResult result) async {
+  Future<String> getFusionReading(FusionResult result, {String? question}) async {
     final m = result.meihua;
     final t = result.tarot;
     final msg = '''
-【梅花卦象】
+${question != null && question.isNotEmpty ? '【用户的问题】\n$question\n' : ''}【梅花卦象】
 本卦：${m.benGua.name}
 卦辞：${m.benGua.guaCi}（${m.benGua.guaCiTranslation}）
 体用：${m.tiYong.relation}（体卦${m.tiYong.tiGua.name}${m.tiYong.tiElement}，用卦${m.tiYong.yongGua.name}${m.tiYong.yongElement}）
@@ -99,15 +103,15 @@ class DeepseekLlmService extends LlmService {
 【塔罗牌面】
 ${t.positions.map((p) => '${p.name}：${p.card.name}（${p.isReversed ? "逆位" : "正位"}）\n牌义：${p.isReversed ? p.card.meaningDown : p.card.meaningUp}').join('\n\n')}
 
-请给出融合以上两种体系的综合解读。
+请针对用户的问题，融合以上两种体系给出综合解读。
 ''';
     return _callDeepSeek(_fusionSystemPrompt, msg);
   }
 
   @override
-  Future<String> getMeihuaReading(MeihuaResult result) async {
+  Future<String> getMeihuaReading(MeihuaResult result, {String? question}) async {
     final msg = '''
-本卦：${result.benGua.name}
+${question != null && question.isNotEmpty ? '【用户的问题】\n$question\n' : ''}本卦：${result.benGua.name}
 卦辞：${result.benGua.guaCi}（${result.benGua.guaCiTranslation}）
 互卦：${result.huGua.name}
 变卦：${result.bianGua.name}
@@ -116,24 +120,24 @@ ${t.positions.map((p) => '${p.name}：${p.card.name}（${p.isReversed ? "逆位"
 体卦：${result.tiYong.tiGua.name}（${result.tiYong.tiElement}）
 用卦：${result.tiYong.yongGua.name}（${result.tiYong.yongElement}）
 
-请给出完整的梅花易数卦象解读。
+请针对用户的问题，给出完整的梅花易数卦象解读。
 ''';
     return _callDeepSeek(_meihuaSystemPrompt, msg);
   }
 
   @override
-  Future<String> getTarotReading(TarotSpread spread) async {
+  Future<String> getTarotReading(TarotSpread spread, {String? question}) async {
     final msg = '''
-牌阵：过去-现在-未来
+${question != null && question.isNotEmpty ? '【用户的问题】\n$question\n' : ''}牌阵：过去-现在-未来
 ${spread.positions.map((p) => '【${p.name}】${p.card.name}（${p.isReversed ? "逆位" : "正位"}）\n牌义：${p.isReversed ? p.card.meaningDown : p.card.meaningUp}\n关键词：${p.card.keyword}').join('\n\n')}
 
-请给出完整的三牌阵塔罗解读。
+请针对用户的问题，给出完整的三牌阵塔罗解读。
 ''';
     return _callDeepSeek(_tarotSystemPrompt, msg);
   }
 
   @override
-  Future<String> getBaziReading(BaziResult result) async {
+  Future<String> getBaziReading(BaziResult result, {String? question}) async {
     final msg = '''
 日主：${result.dayMaster}（${result.dayMasterElement}）
 四柱：

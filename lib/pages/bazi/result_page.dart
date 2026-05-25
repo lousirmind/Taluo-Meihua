@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../models/bazi/bazi_result.dart';
 import '../../widgets/disclaimer_text.dart';
 import '../../services/llm_service.dart';
@@ -701,9 +702,8 @@ class _BaziResultPageState extends State<BaziResultPage> {
                     style: TextStyle(color: cs.error, fontSize: 13),
                   );
                 }
-                return Text(
-                  snapshot.data ?? '暂无解读',
-                  style: const TextStyle(height: 1.7, fontSize: 14),
+                return MarkdownBody(
+                  data: snapshot.data ?? '暂无解读',
                 );
               },
             ),

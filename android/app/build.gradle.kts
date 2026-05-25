@@ -17,8 +17,8 @@ android {
         applicationId = "com.lingxitianji.tarot_meihua"
         minSdk = 26
         targetSdk = flutter.targetSdkVersion
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 3
+        versionName = "1.0.2"
     }
 
     signingConfigs {

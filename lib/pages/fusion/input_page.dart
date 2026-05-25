@@ -43,7 +43,10 @@ class _FusionInputPageState extends State<FusionInputPage> {
       return;
     }
     final result = MeihuaEngine.calculate(n1, n2, n3);
-    Navigator.pushNamed(context, '/fusion/hexagram', arguments: result);
+    Navigator.pushNamed(context, '/fusion/hexagram', arguments: {
+      'result': result,
+      'question': _questionCtrl.text.trim(),
+    });
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../models/fusion_result.dart';
 import '../../services/llm_service.dart';
 import '../../widgets/disclaimer_text.dart';
@@ -20,7 +21,7 @@ class _FusionReadingPageState extends State<FusionReadingPage> {
   @override
   void initState() {
     super.initState();
-    _reading = LlmService.instance.getFusionReading(widget.fusionResult).then((v) {
+    _reading = LlmService.instance.getFusionReading(widget.fusionResult, question: widget.fusionResult.question).then((v) {
       _autoSave();
       return v;
     });
@@ -33,7 +34,7 @@ class _FusionReadingPageState extends State<FusionReadingPage> {
     SaveHelper.saveFusion(
       hexagramData: SaveHelper.encodeMeihua(r.meihua),
       tarotCards: SaveHelper.encodeTarot(r.tarot),
-      question: null,
+      question: r.question,
     );
   }
 
@@ -60,6 +61,18 @@ class _FusionReadingPageState extends State<FusionReadingPage> {
             _buildTarotCards(t, colors),
             const SizedBox(height: 16),
             // LLM解读
+            if (r.question != null && r.question!.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text('你的问题：${r.question}', style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+              ),
+            ],
+            const SizedBox(height: 8),
             _buildReadingCard(),
             const SizedBox(height: 8),
             const DisclaimerText(),
@@ -193,7 +206,7 @@ class _FusionReadingPageState extends State<FusionReadingPage> {
                 if (snapshot.hasError) {
                   return Text('解读生成失败: ${snapshot.error}', style: const TextStyle(color: Colors.red));
                 }
-                return Text(snapshot.data ?? '', style: const TextStyle(height: 1.6, fontSize: 14));
+                return MarkdownBody(data: snapshot.data ?? '');
               },
             ),
           ],

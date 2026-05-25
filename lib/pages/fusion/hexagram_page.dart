@@ -10,7 +10,8 @@ import '../../app/theme.dart';
 
 class FusionHexagramPage extends StatefulWidget {
   final MeihuaResult meihuaResult;
-  const FusionHexagramPage({super.key, required this.meihuaResult});
+  final String? question;
+  const FusionHexagramPage({super.key, required this.meihuaResult, this.question});
 
   @override
   State<FusionHexagramPage> createState() => _FusionHexagramPageState();
@@ -78,6 +79,7 @@ class _FusionHexagramPageState extends State<FusionHexagramPage> {
                         meihua: r,
                         tarot: spread,
                         createTime: DateTime.now(),
+                        question: widget.question,
                       );
                       Navigator.pushNamed(context, '/fusion/flip', arguments: fusion);
                     },

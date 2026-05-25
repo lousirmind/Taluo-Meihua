@@ -74,9 +74,11 @@ class LingXiTianJiApp extends StatelessWidget {
           settings: settings,
         );
       case '/fusion/hexagram':
+        final hexArgs = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
           builder: (_) => fusion_hexagram.FusionHexagramPage(
-            meihuaResult: settings.arguments as MeihuaResult,
+            meihuaResult: hexArgs['result'] as MeihuaResult,
+            question: hexArgs['question'] as String?,
           ),
           settings: settings,
         );

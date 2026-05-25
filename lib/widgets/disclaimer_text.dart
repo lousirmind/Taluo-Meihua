@@ -6,23 +6,12 @@ class DisclaimerText extends StatelessWidget {
 
   const DisclaimerText({
     super.key,
-    this.text = '以上内容仅供娱乐参考，请理性看待。',
+    this.text = '',
     this.fontSize = 12,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: fontSize,
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-          fontStyle: FontStyle.italic,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
+    return const SizedBox.shrink();
   }
 }

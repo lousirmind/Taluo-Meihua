@@ -5,7 +5,7 @@ import '../../data/secure_storage.dart';
 import '../../data/database/history_dao.dart';
 import '../../services/llm_service.dart';
 import '../../services/deepseek_service.dart';
-import '../../widgets/disclaimer_text.dart';
+import '../../version.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -196,32 +196,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 ListTile(
                   leading: const Icon(Icons.info_outline),
                   title: const Text('关于灵犀天机'),
-                  subtitle: const Text('v1.0.0'),
+                  subtitle: const Text(AppVersion.display),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
-          Card(
-            color: cs.errorContainer.withValues(alpha: 0.3),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('免责声明', style: TextStyle(fontWeight: FontWeight.bold, color: cs.onErrorContainer)),
-                  const SizedBox(height: 8),
-                  Text(
-                    '灵犀天机是一款传统文化研究与娱乐工具。所有占卜结果、命理解读由算法和 AI 生成，仅供娱乐参考，不构成任何实际决策建议。'
-                    '请理性看待，切勿迷信。用户数据仅存储在本地设备，不会上传至任何服务器。',
-                    style: TextStyle(fontSize: 12, color: cs.onErrorContainer.withValues(alpha: 0.7)),
-                  ),
-                ],
-              ),
-            ),
-          ),
           const SizedBox(height: 12),
-          const DisclaimerText(),
         ],
       ),
     );

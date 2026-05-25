@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../models/fusion_result.dart';
-import '../../models/tarot/tarot_spread.dart';
 import '../../widgets/card_flip.dart';
 import '../../app/theme.dart';
 
@@ -58,10 +57,8 @@ class _FusionFlipPageState extends State<FusionFlipPage> {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(pos.name, style: tt.labelMedium),
-                      const SizedBox(height: 8),
                       CardFlipWidget(
-                        front: _buildFace(pos, cs, colors),
+                        front: _buildEmptyCard(cs),
                         back: _buildBack(cs),
                         flipped: _flipped[i],
                         onFlip: () => setState(() => _flippedCount++),
@@ -69,7 +66,9 @@ class _FusionFlipPageState extends State<FusionFlipPage> {
                         height: 160,
                       ),
                       if (_flipped[i]) ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 6),
+                        Text(pos.name, style: tt.labelMedium?.copyWith(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 2),
                         Text(pos.card.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                         const SizedBox(height: 2),
                         Container(
@@ -121,37 +120,12 @@ class _FusionFlipPageState extends State<FusionFlipPage> {
     );
   }
 
-  Widget _buildFace(TarotPosition pos, ColorScheme cs, dynamic colors) {
+  Widget _buildEmptyCard(ColorScheme cs) {
     return Container(
       decoration: BoxDecoration(
-        color: cs.surface,
+        color: cs.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: pos.isReversed ? Colors.orange : Colors.green.shade300,
-          width: 1.5,
-        ),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4, offset: const Offset(0, 2))],
-      ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                _suitIcon(pos.card.suit),
-                size: 28,
-                color: cs.primary,
-              ),
-              const SizedBox(height: 6),
-              Text(
-                pos.card.keyword,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-        ),
+        border: Border.all(color: cs.outlineVariant, width: 1),
       ),
     );
   }
@@ -173,13 +147,4 @@ class _FusionFlipPageState extends State<FusionFlipPage> {
     );
   }
 
-  IconData _suitIcon(String suit) {
-    switch (suit) {
-      case 'wands': return Icons.local_fire_department;
-      case 'cups': return Icons.water_drop;
-      case 'swords': return Icons.content_cut;
-      case 'pentacles': return Icons.circle;
-      default: return Icons.star;
-    }
-  }
 }

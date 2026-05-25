@@ -6,11 +6,13 @@ class FusionResult {
   final TarotSpread tarot;
   final String llmInterpretation;
   final DateTime createTime;
+  final String? question;
 
   const FusionResult({
     required this.meihua,
     required this.tarot,
     this.llmInterpretation = '',
     required this.createTime,
+    this.question,
   });
 }
