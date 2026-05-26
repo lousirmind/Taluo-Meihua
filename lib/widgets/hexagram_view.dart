@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import '../models/meihua/hexagram.dart';
 
-/// 卦象可视化组件 — 垂直展示6条阴阳爻
+/// 卦象可视化组件 — 显示上下卦 Unicode 符号
 class HexagramView extends StatelessWidget {
   final Hexagram hexagram;
-  final double lineWidth;
-  final int? highlightYao; // 高亮的爻位置（动爻）
+  final double symbolSize;
+  final int? highlightYao;
   final bool showLabel;
 
   const HexagramView({
     super.key,
     required this.hexagram,
-    this.lineWidth = 40,
+    this.symbolSize = 32,
     this.highlightYao,
     this.showLabel = true,
   });
@@ -23,39 +23,11 @@ class HexagramView extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (showLabel) ...[
-          Text(hexagram.name, style: TextStyle(fontWeight: FontWeight.bold, color: cs.primary)),
+          Text(hexagram.name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: cs.primary)),
           const SizedBox(height: 4),
         ],
-        ...List.generate(6, (i) {
-          final yao = hexagram.lines[5 - i]; // 从上到下显示
-          final isHighlight = highlightYao == yao.position;
-          return Container(
-            margin: const EdgeInsets.symmetric(vertical: 1.5),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: lineWidth,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: isHighlight ? Colors.amber : cs.primary,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-                if (!yao.isYang)
-                  Container(
-                    width: 4,
-                    height: 6,
-                    margin: const EdgeInsets.symmetric(horizontal: 2),
-                    decoration: BoxDecoration(
-                      color: cs.surface,
-                      borderRadius: BorderRadius.circular(1),
-                    ),
-                  ),
-              ],
-            ),
-          );
-        }),
+        Text(hexagram.upperSymbol, style: TextStyle(fontSize: symbolSize)),
+        Text(hexagram.lowerSymbol, style: TextStyle(fontSize: symbolSize)),
       ],
     );
   }
@@ -93,7 +65,7 @@ class HexagramComparison extends StatelessWidget {
       children: [
         Text(label, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
         const SizedBox(height: 4),
-        HexagramView(hexagram: h, lineWidth: 28, highlightYao: highlight, showLabel: true),
+        HexagramView(hexagram: h, symbolSize: 28, highlightYao: highlight, showLabel: true),
       ],
     );
   }

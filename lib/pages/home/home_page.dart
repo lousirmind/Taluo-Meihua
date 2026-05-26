@@ -15,10 +15,9 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final tt = Theme.of(context).textTheme;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('灵犀天机'),
+        title: const Text(''),
         backgroundColor: cs.surface,
         foregroundColor: cs.onSurface,
       ),
@@ -26,37 +25,8 @@ class HomePage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            _buildHeader(cs, tt),
-            const SizedBox(height: 24),
+            const SizedBox(height: 8),
             Expanded(child: _buildGrid(context)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(ColorScheme cs, TextTheme tt) {
-    return Card(
-      color: cs.primaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(Icons.auto_awesome, color: cs.onPrimaryContainer, size: 32),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('灵犀天机', style: tt.titleLarge?.copyWith(
-                    color: cs.onPrimaryContainer,
-                    fontWeight: FontWeight.bold,
-                  )),
-                  const SizedBox(height: 2),
-                  Text('梅花·塔罗·八字·融合', style: TextStyle(color: cs.onPrimaryContainer.withValues(alpha: 0.8))),
-                ],
-              ),
-            ),
           ],
         ),
       ),

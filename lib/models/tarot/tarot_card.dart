@@ -32,6 +32,8 @@ class TarotCard {
     );
   }
 
+  String get imagePath => 'assets/tarot/$id.png';
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,

@@ -58,7 +58,7 @@ class _FusionFlipPageState extends State<FusionFlipPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       CardFlipWidget(
-                        front: _buildEmptyCard(cs),
+                        front: _buildCardFace(pos, cs),
                         back: _buildBack(cs),
                         flipped: _flipped[i],
                         onFlip: () => setState(() {
@@ -123,12 +123,14 @@ class _FusionFlipPageState extends State<FusionFlipPage> {
     );
   }
 
-  Widget _buildEmptyCard(ColorScheme cs) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: cs.outlineVariant, width: 1),
+  Widget _buildCardFace(dynamic pos, ColorScheme cs) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Image.asset(
+        pos.card.imagePath,
+        fit: BoxFit.cover,
+        width: 100,
+        height: 160,
       ),
     );
   }

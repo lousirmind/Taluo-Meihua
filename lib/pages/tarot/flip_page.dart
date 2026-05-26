@@ -246,12 +246,13 @@ class _TarotFlipPageState extends State<TarotFlipPage> {
   }
 
   Widget _buildCardFace(TarotPosition position, ColorScheme cs) {
-    // 牌框留空，后续放图片
-    return Container(
-      decoration: BoxDecoration(
-        color: cs.surfaceContainerHighest.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: cs.outlineVariant, width: 1),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Image.asset(
+        position.card.imagePath,
+        fit: BoxFit.cover,
+        width: 100,
+        height: 160,
       ),
     );
   }
